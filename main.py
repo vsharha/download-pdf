@@ -12,7 +12,7 @@ def download_pdfs(url: str) -> None:
 
     for i, a in enumerate(soup.select("a[href$='.pdf']")):
         pdf_url = urljoin(url, a["href"])
-        name = f"{i}_{pdf_url.split('/')[-1]}"
+        name = f"{i+1}_{pdf_url.split('/')[-1]}"
         data = requests.get(pdf_url).content
         (out / name).write_bytes(data)
 
