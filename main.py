@@ -10,9 +10,9 @@ def download_pdfs(url: str) -> None:
     html = requests.get(url).text
     soup = BeautifulSoup(html, "html.parser")
 
-    for a in soup.select("a[href$='.pdf']"):
+    for i, a in enumerate(soup.select("a[href$='.pdf']")):
         pdf_url = urljoin(url, a["href"])
-        name = pdf_url.split("/")[-1]
+        name = f"{i}_{pdf_url.split('/')[-1]}"
         data = requests.get(pdf_url).content
         (out / name).write_bytes(data)
 
