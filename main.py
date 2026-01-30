@@ -68,7 +68,7 @@ def main():
     pdf_dir = Path(PDF_DIR)
     output_dir = pdf_dir / "image"
 
-    # download_pdfs(url)
+    download_pdfs(url)
     convert_image_pdfs(pdf_dir, output_dir)
 
 if __name__ == "__main__":
