@@ -54,6 +54,7 @@ def download_transcripts(section_id: str, course_name: str, out_root: Path) -> N
     out_dir.mkdir(parents=True, exist_ok=True)
 
     lessons = get_lessons(session, section_id)
+    skipped = 0
     for item in lessons:
         if item.get("type") != "SyllabusLessonType":
             continue
@@ -71,7 +72,7 @@ def download_transcripts(section_id: str, course_name: str, out_root: Path) -> N
         filename = out_dir / f"{start}_{safe_filename(name)}.txt"
 
         if filename.exists():
-            print(f"  Skipping (exists): {filename.name}")
+            skipped += 1
             continue
 
         cues = get_transcript(session, lesson_id, media_id)
@@ -81,3 +82,6 @@ def download_transcripts(section_id: str, course_name: str, out_root: Path) -> N
 
         filename.write_text(cues_to_text(cues), encoding="utf-8")
         print(f"  Downloaded: {filename.name}")
+
+    if skipped:
+        print(f"Skipped {skipped} already downloaded transcript(s)")
