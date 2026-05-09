@@ -5,6 +5,8 @@ courses:
       url: "https://opencourse.inf.ed.ac.uk/inf2d/course-materials"
       patterns: ["week-*/lecture-*"]
       link_text_patterns: ["INF2D *"]
+    echo360:
+      section_id: "89dac3da-c514-449d-8d3b-d01b878a8747"
 
 #  inf2-fds:
 #    notebook_id: "fcf1a72f-3ccf-457d-9996-7f819791c413"
