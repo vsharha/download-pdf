@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-nlm-sources = "main:main"
+nlm-sources = "notebooklm_sources.main:main"
 
 [tool.setuptools.packages.find]
 include = ["notebooklm_sources*"]
