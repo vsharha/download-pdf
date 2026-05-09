@@ -58,17 +58,22 @@ def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, d
         return
 
     image_dir = Path("courses") / course_name / "pdf" / "image"
-    if not image_dir.exists():
-        print(f"No image PDFs found in {image_dir}")
+    transcript_dir = Path("courses") / course_name / "transcripts"
+
+    image_pdfs = sorted(image_dir.glob("*.pdf")) if image_dir.exists() else []
+    transcripts = sorted(transcript_dir.glob("*.txt")) if transcript_dir.exists() else []
+
+    if not image_pdfs and not transcripts:
+        print("No files to upload.")
         return
 
-    image_pdfs = sorted(p for p in image_dir.iterdir() if p.suffix.lower() == ".pdf")
-    if not image_pdfs:
-        print(f"No image PDFs found in {image_dir}")
-        return
+    if image_pdfs:
+        print(f"Found {len(image_pdfs)} image PDF(s) to upload")
+        upload_sources(notebook_id, image_pdfs)
 
-    print(f"Found {len(image_pdfs)} image PDF(s) to upload")
-    upload_sources(notebook_id, image_pdfs)
+    if transcripts:
+        print(f"Found {len(transcripts)} transcript(s) to upload")
+        upload_sources(notebook_id, transcripts)
 
 
 def main():
