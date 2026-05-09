@@ -5,6 +5,7 @@ from notebooklm_sources.mapping import CourseConfig, SourcesConfig, load_mapping
 from notebooklm_sources.pdf_page import collect_links, collect_indexed_pages
 from notebooklm_sources.pdf import download_pdfs_from_pages
 from notebooklm_sources.upload_sources import upload_sources
+from notebooklm_sources.echo360 import download_transcripts
 
 
 def resolve_pages(sources: SourcesConfig) -> set[str]:
@@ -44,6 +45,9 @@ def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, d
         return
 
     download_pdfs_from_pages(pages, subdir=course_name)
+
+    if config.echo360:
+        download_transcripts(config.echo360.section_id, course_name, Path("courses"))
 
     if no_upload:
         return
