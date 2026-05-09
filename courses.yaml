@@ -3,18 +3,19 @@ courses:
     notebook_id: "7733edc5-7ed2-4e59-b0be-a53dce198a26"
     sources:
       url: "https://opencourse.inf.ed.ac.uk/inf2d/course-materials"
-      patterns: ["week-*", "lecture-*"]
+      patterns: ["week-*/lecture-*"]
+      link_text_patterns: ["INF2D *"]
 
-  inf2-fds:
-    notebook_id: "fcf1a72f-3ccf-457d-9996-7f819791c413"
-    sources:
-      url: "https://opencourse.inf.ed.ac.uk/inf2-fds/resource-list"
+#  inf2-fds:
+#    notebook_id: "fcf1a72f-3ccf-457d-9996-7f819791c413"
+#    sources:
+#      url: "https://opencourse.inf.ed.ac.uk/inf2-fds/resource-list"
 
 #  inf2-iads:
 #    notebook_id: "0fc9e3d6-de9e-47dc-980c-055f35b70ac2"
 #    sources:
 #      url: "https://opencourse.inf.ed.ac.uk/inf2-iads/course-materials"
-#      patterns: ["semester-{n}", "schedule"]
+#      patterns: ["semester-{n}/schedule"]
 #      extra_pages: ["https://opencourse.inf.ed.ac.uk/node/2352"]
 
 #  inf2-sepp:

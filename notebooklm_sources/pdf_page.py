@@ -16,8 +16,14 @@ def same_domain(base: str, url: str) -> bool:
     return urlparse(base).netloc == urlparse(url).netloc
 
 
-def collect_links(page_url: str, path_pattern: str) -> set[str]:
+def collect_links(
+    page_url: str,
+    path_pattern: str,
+    link_text_patterns: list[str] | None = None,
+    visited: set[str] | None = None,
+) -> set[str]:
     rx = glob_to_regex(path_pattern)
+    text_rxs = [glob_to_regex(p) for p in (link_text_patterns or [])]
 
     html = requests.get(page_url, timeout=15).text
     soup = BeautifulSoup(html, "html.parser")
@@ -30,16 +36,20 @@ def collect_links(page_url: str, path_pattern: str) -> set[str]:
         if urlparse(href).netloc != urlparse(page_url).netloc:
             continue
 
+        if visited and href in visited:
+            continue
+
         path = urlparse(href).path.lstrip("/")
 
-        # Absolute path pattern
-        if path_pattern.startswith("/"):
-            if rx.match("/" + path):
-                matches.add(href)
-        # Relative (suffix) pattern
-        else:
-            if rx.match(path.split("/")[-1]):
-                matches.add(href)
+        path_match = (
+            rx.match("/" + path)
+            if path_pattern.startswith("/")
+            else rx.match(path.split("/")[-1])
+        )
+        text_match = any(t.match(a.get_text(strip=True)) for t in text_rxs)
+
+        if path_match or text_match:
+            matches.add(href)
 
     return matches
 

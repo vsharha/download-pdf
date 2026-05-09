@@ -13,6 +13,7 @@ class SourcesConfig(BaseModel):
 
     url: HttpUrl
     patterns: list[str] = Field(default_factory=list)
+    link_text_patterns: list[str] = Field(default_factory=list)
     extra_pages: list[HttpUrl] = Field(default_factory=list)
 
 

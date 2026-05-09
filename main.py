@@ -7,15 +7,24 @@ from notebooklm_sources.upload_sources import upload_sources
 
 
 def resolve_pages(sources: SourcesConfig) -> set[str]:
-    pages = {str(sources.url)}
-    for pattern in sources.patterns:
-        next_pages = set()
-        for page in pages:
-            if "{n}" in pattern:
-                next_pages |= collect_indexed_pages(page, pattern)
-            else:
-                next_pages |= collect_links(page, pattern)
-        pages = next_pages
+    visited = {str(sources.url)}
+    pages = set()
+    for pattern_path in sources.patterns:
+        steps = pattern_path.split("/")
+        current = {str(sources.url)}
+        for i, step in enumerate(steps):
+            is_last = i == len(steps) - 1
+            text_patterns = sources.link_text_patterns if is_last else None
+            next_level = set()
+            for page in current:
+                if "{n}" in step:
+                    next_level |= collect_indexed_pages(page, step)
+                else:
+                    next_level |= collect_links(page, step, text_patterns, visited)
+            next_level -= visited
+            visited |= next_level
+            current = next_level
+        pages |= current
     pages |= {str(page) for page in sources.extra_pages}
     return pages
 
