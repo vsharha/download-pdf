@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from notebooklm_sources.mapping import CourseConfig, SourcesConfig, load_mapping
@@ -29,7 +30,7 @@ def resolve_pages(sources: SourcesConfig) -> set[str]:
     return pages
 
 
-def process_course(course_name: str, config: CourseConfig):
+def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, dry_run: bool):
     print(f"\n{'=' * 40}")
     print(f"Processing: {course_name}")
     print(f"{'=' * 40}")
@@ -37,7 +38,16 @@ def process_course(course_name: str, config: CourseConfig):
     pages = resolve_pages(config.sources)
     print(f"Found {len(pages)} page(s)")
 
+    if dry_run:
+        for page in sorted(pages):
+            print(f"  {page}")
+        return
+
     download_pdfs_from_pages(pages, subdir=course_name)
+
+    if no_upload:
+        return
+
     notebook_id = config.notebook_id
     if not notebook_id:
         print("No notebook ID configured; nothing was uploaded.")
@@ -58,8 +68,13 @@ def process_course(course_name: str, config: CourseConfig):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--no-upload", action="store_true", help="Download sources but skip NotebookLM upload")
+    parser.add_argument("--dry-run", action="store_true", help="Resolve sources and print them without downloading")
+    args = parser.parse_args()
+
     for course_name, config in load_mapping().items():
-        process_course(course_name, config)
+        process_course(course_name, config, no_upload=args.no_upload, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":
