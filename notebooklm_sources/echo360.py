@@ -24,13 +24,6 @@ def _build_session(cookies_path: Path = COOKIES_PATH) -> requests.Session:
     return session
 
 
-def _section_id_from_url(section_url: str) -> str:
-    m = re.search(r"/section/([^/]+)", section_url)
-    if not m:
-        raise ValueError(f"Cannot extract section ID from URL: {section_url}")
-    return m.group(1)
-
-
 def _get_lessons(session: requests.Session, section_id: str) -> list[dict]:
     r = session.get(f"{ECHO_HOST}/section/{section_id}/syllabus")
     r.raise_for_status()
@@ -55,9 +48,8 @@ def _cues_to_text(cues: list[dict]) -> str:
     return "\n".join(cue["content"] for cue in cues)
 
 
-def download_transcripts(section_url: str, course_name: str, out_root: Path) -> None:
+def download_transcripts(section_id: str, course_name: str, out_root: Path) -> None:
     session = _build_session()
-    section_id = _section_id_from_url(section_url)
     out_dir = out_root / course_name / "transcripts"
     out_dir.mkdir(parents=True, exist_ok=True)
 

@@ -20,7 +20,7 @@ class SourcesConfig(BaseModel):
 class Echo360Config(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    section_url: HttpUrl
+    section_id: str
 
 
 class CourseConfig(BaseModel):
