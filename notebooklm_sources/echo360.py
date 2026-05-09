@@ -10,7 +10,7 @@ COOKIES_PATH = Path(__file__).resolve().parents[1] / "cookies.txt"
 ECHO_HOST = "https://echo360.org.uk"
 
 
-def _build_session(cookies_path: Path = COOKIES_PATH) -> requests.Session:
+def build_session(cookies_path: Path = COOKIES_PATH) -> requests.Session:
     jar = http.cookiejar.MozillaCookieJar()
     jar.load(str(cookies_path), ignore_discard=True, ignore_expires=True)
     session = requests.Session()
@@ -24,13 +24,13 @@ def _build_session(cookies_path: Path = COOKIES_PATH) -> requests.Session:
     return session
 
 
-def _get_lessons(session: requests.Session, section_id: str) -> list[dict]:
+def get_lessons(session: requests.Session, section_id: str) -> list[dict]:
     r = session.get(f"{ECHO_HOST}/section/{section_id}/syllabus")
     r.raise_for_status()
     return r.json()["data"]
 
 
-def _get_transcript(session: requests.Session, lesson_id: str, media_id: str) -> list[dict] | None:
+def get_transcript(session: requests.Session, lesson_id: str, media_id: str) -> list[dict] | None:
     url = f"{ECHO_HOST}/api/ui/echoplayer/lessons/{lesson_id}/medias/{media_id}/transcript"
     r = session.get(url)
     if r.status_code == 404:
@@ -40,20 +40,20 @@ def _get_transcript(session: requests.Session, lesson_id: str, media_id: str) ->
     return cues if isinstance(cues, list) else None
 
 
-def _safe_filename(name: str) -> str:
+def safe_filename(name: str) -> str:
     return re.sub(r"[^\w\s-]", "", name).strip().replace(" ", "_")
 
 
-def _cues_to_text(cues: list[dict]) -> str:
+def cues_to_text(cues: list[dict]) -> str:
     return "\n".join(cue["content"] for cue in cues)
 
 
 def download_transcripts(section_id: str, course_name: str, out_root: Path) -> None:
-    session = _build_session()
+    session = build_session()
     out_dir = out_root / course_name / "transcripts"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    lessons = _get_lessons(session, section_id)
+    lessons = get_lessons(session, section_id)
     for item in lessons:
         if item.get("type") != "SyllabusLessonType":
             continue
@@ -68,16 +68,16 @@ def download_transcripts(section_id: str, course_name: str, out_root: Path) -> N
             continue
 
         media_id = medias[0]["id"]
-        filename = out_dir / f"{start}_{_safe_filename(name)}.txt"
+        filename = out_dir / f"{start}_{safe_filename(name)}.txt"
 
         if filename.exists():
             print(f"  Skipping (exists): {filename.name}")
             continue
 
-        cues = _get_transcript(session, lesson_id, media_id)
+        cues = get_transcript(session, lesson_id, media_id)
         if cues is None:
             print(f"  No transcript: {name}")
             continue
 
-        filename.write_text(_cues_to_text(cues), encoding="utf-8")
+        filename.write_text(cues_to_text(cues), encoding="utf-8")
         print(f"  Downloaded: {filename.name}")
