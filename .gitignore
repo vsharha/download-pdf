@@ -9,8 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
-pdfs
+courses
 .idea
 profile/
+cookies.txt
 
 .DS_Store

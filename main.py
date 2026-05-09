@@ -43,7 +43,7 @@ def process_course(course_name: str, config: CourseConfig):
         print("No notebook ID configured; nothing was uploaded.")
         return
 
-    image_dir = Path("pdfs") / course_name / "image"
+    image_dir = Path("courses") / course_name / "pdf" / "image"
     if not image_dir.exists():
         print(f"No image PDFs found in {image_dir}")
         return

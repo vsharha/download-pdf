@@ -17,11 +17,18 @@ class SourcesConfig(BaseModel):
     extra_pages: list[HttpUrl] = Field(default_factory=list)
 
 
+class Echo360Config(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    section_url: HttpUrl
+
+
 class CourseConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     sources: SourcesConfig
     notebook_id: str | None = Field(default=None, pattern=NOTEBOOK_ID_PATTERN)
+    echo360: Echo360Config | None = None
 
 
 class CoursesConfig(BaseModel):

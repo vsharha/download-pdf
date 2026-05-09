@@ -5,10 +5,10 @@ from pathlib import Path
 from pdf2image import convert_from_path
 import gc
 
-PDF_DIR = "pdfs"
+COURSES_DIR = "courses"
 
 def download_pdfs_from_pages(pages: set[str], subdir: str = "", image: bool = True):
-    out = Path(PDF_DIR) / subdir
+    out = Path(COURSES_DIR) / subdir / "pdf"
     out.mkdir(parents=True, exist_ok=True)
 
     existing = {p.name for p in out.iterdir() if p.suffix.lower() == ".pdf"}
