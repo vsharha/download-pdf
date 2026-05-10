@@ -12,7 +12,7 @@ courses:
 #  inf2-fds:
 #    notebook_id: "fcf1a72f-3ccf-457d-9996-7f819791c413"
 #    sources:
-#      url: "https://opencourse.inf.ed.ac.uk/inf2-fds/resource-list"
+#      pages: ["https://opencourse.inf.ed.ac.uk/inf2-fds/resource-list"]
 
 #  inf2-iads:
 #    notebook_id: "0fc9e3d6-de9e-47dc-980c-055f35b70ac2"
@@ -20,8 +20,8 @@ courses:
 #      url: "https://opencourse.inf.ed.ac.uk/inf2-iads/course-materials"
 #      traverse: ["semester-{n]"]
 #      collect: ["semester-*/schedule"]
-#      extra_pages: ["https://opencourse.inf.ed.ac.uk/node/2352"]
+#      pages: ["https://opencourse.inf.ed.ac.uk/node/2352"]
 
 #  inf2-sepp:
 #    sources:
-#      url: "https://opencourse.inf.ed.ac.uk/inf2-sepp/schedule"
+#      pages: ["https://opencourse.inf.ed.ac.uk/inf2-sepp/schedule"]
