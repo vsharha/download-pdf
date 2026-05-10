@@ -1,3 +1,4 @@
+from enum import Enum
 from pathlib import Path
 
 import yaml
@@ -6,6 +7,12 @@ from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 NOTEBOOK_ID_PATTERN = r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "courses.yaml"
+
+
+class PdfQuality(str, Enum):
+    low = "low"
+    medium = "medium"
+    high = "high"
 
 
 class SourcesConfig(BaseModel):
@@ -33,6 +40,7 @@ class CourseConfig(BaseModel):
     echo360: Echo360Config | None = None
     exclude_files: list[str] = Field(default_factory=list)
     upload_original: bool = False
+    pdf_quality: PdfQuality = PdfQuality.high
 
 
 class CoursesConfig(BaseModel):

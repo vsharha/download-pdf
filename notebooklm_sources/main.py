@@ -75,7 +75,7 @@ def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, d
         return
 
     if pdfs:
-        converter = None if config.upload_original else convert_to_image_bytes
+        converter = None if config.upload_original else lambda p: convert_to_image_bytes(p, config.pdf_quality)
         print(f"Found {len(pdfs)} PDF(s) to upload")
         upload_sources(notebook_id, pdfs, converter=converter, replace=replace)
 

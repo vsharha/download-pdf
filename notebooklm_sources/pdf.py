@@ -7,7 +7,15 @@ from urllib.parse import urljoin
 from pathlib import Path
 from pdf2image import convert_from_path
 
+from notebooklm_sources.mapping import PdfQuality
+
 COURSES_DIR = "courses"
+
+_DPI = {
+    PdfQuality.low: 150,
+    PdfQuality.medium: 200,
+    PdfQuality.high: 300,
+}
 
 
 def download_pdfs_from_pages(pages: set[str], subdir: str = "", exclude_files: list[str] | None = None):
@@ -60,8 +68,8 @@ def download_pdfs_from_pages(pages: set[str], subdir: str = "", exclude_files: l
         print(f"Skipped {skipped} already downloaded file(s)")
 
 
-def convert_to_image_bytes(pdf_path: Path) -> bytes:
-    pages = convert_from_path(pdf_path, dpi=300, fmt="jpeg", thread_count=1)
+def convert_to_image_bytes(pdf_path: Path, quality: PdfQuality = PdfQuality.high) -> bytes:
+    pages = convert_from_path(pdf_path, dpi=_DPI[quality], fmt="jpeg", thread_count=1)
     try:
         pages = [p.convert("RGB") for p in pages]
         buf = io.BytesIO()
