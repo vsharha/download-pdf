@@ -61,7 +61,7 @@ def download_pdfs_from_pages(pages: set[str], subdir: str = "", exclude_files: l
 
 
 def convert_to_image_bytes(pdf_path: Path) -> bytes:
-    pages = convert_from_path(pdf_path, dpi=200, fmt="jpeg", thread_count=1)
+    pages = convert_from_path(pdf_path, dpi=300, fmt="jpeg", thread_count=1)
     try:
         pages = [p.convert("RGB") for p in pages]
         buf = io.BytesIO()
