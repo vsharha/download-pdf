@@ -1,3 +1,4 @@
+import fnmatch
 import gc
 import io
 import requests
@@ -9,7 +10,7 @@ from pdf2image import convert_from_path
 COURSES_DIR = "courses"
 
 
-def download_pdfs_from_pages(pages: set[str], subdir: str = ""):
+def download_pdfs_from_pages(pages: set[str], subdir: str = "", exclude_files: list[str] | None = None):
     out = Path(COURSES_DIR) / subdir / "pdf"
     out.mkdir(parents=True, exist_ok=True)
 
@@ -33,6 +34,9 @@ def download_pdfs_from_pages(pages: set[str], subdir: str = ""):
 
             seen.add(pdf_url)
             name = pdf_url.split("/")[-1]
+
+            if exclude_files and any(fnmatch.fnmatch(name, pat) for pat in exclude_files):
+                continue
 
             if name in existing:
                 skipped += 1

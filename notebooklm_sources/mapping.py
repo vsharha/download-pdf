@@ -16,6 +16,7 @@ class SourcesConfig(BaseModel):
     collect: list[str] = Field(default_factory=list)
     include_text: list[str] = Field(default_factory=list)
     exclude_text: list[str] = Field(default_factory=list)
+    exclude_files: list[str] = Field(default_factory=list)
     pages: list[HttpUrl] = Field(default_factory=list)
 
 
