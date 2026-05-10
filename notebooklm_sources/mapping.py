@@ -31,6 +31,7 @@ class CourseConfig(BaseModel):
     sources: SourcesConfig
     notebook_id: str | None = Field(default=None, pattern=NOTEBOOK_ID_PATTERN)
     echo360: Echo360Config | None = None
+    upload_original: bool = False
 
 
 class CoursesConfig(BaseModel):

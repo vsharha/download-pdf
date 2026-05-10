@@ -3,7 +3,7 @@ from pathlib import Path
 
 from notebooklm_sources.mapping import CourseConfig, SourcesConfig, load_mapping
 from notebooklm_sources.pdf_page import collect_links, collect_indexed_pages
-from notebooklm_sources.pdf import download_pdfs_from_pages
+from notebooklm_sources.pdf import download_pdfs_from_pages, convert_to_image_bytes
 from notebooklm_sources.upload_sources import upload_sources
 from notebooklm_sources.echo360 import download_transcripts
 
@@ -64,19 +64,20 @@ def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, d
         print("No notebook ID configured; nothing was uploaded.")
         return
 
-    image_dir = Path("courses") / course_name / "pdf" / "image"
+    pdf_dir = Path("courses") / course_name / "pdf"
     transcript_dir = Path("courses") / course_name / "transcripts"
 
-    image_pdfs = sorted(image_dir.glob("*.pdf")) if image_dir.exists() else []
+    pdfs = sorted(pdf_dir.glob("*.pdf")) if pdf_dir.exists() else []
     transcripts = sorted(transcript_dir.glob("*.txt")) if transcript_dir.exists() else []
 
-    if not image_pdfs and not transcripts:
+    if not pdfs and not transcripts:
         print("No files to upload.")
         return
 
-    if image_pdfs:
-        print(f"Found {len(image_pdfs)} image PDF(s) to upload")
-        upload_sources(notebook_id, image_pdfs)
+    if pdfs:
+        converter = None if config.upload_original else convert_to_image_bytes
+        print(f"Found {len(pdfs)} PDF(s) to upload")
+        upload_sources(notebook_id, pdfs, converter=converter)
 
     if transcripts:
         print(f"Found {len(transcripts)} transcript(s) to upload")

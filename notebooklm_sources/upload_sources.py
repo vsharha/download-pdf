@@ -1,3 +1,5 @@
+import tempfile
+from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -60,6 +62,7 @@ def upload_sources(
     wait: bool = True,
     wait_timeout: float = 600.0,
     replace: bool = False,
+    converter: Callable[[Path], bytes] | None = None,
 ) -> None:
     if not files:
         return
@@ -85,12 +88,13 @@ def upload_sources(
         for file in files_to_upload:
             print(f"Uploading {file.name}")
             old_source_ids = uploaded_source_ids_by_title.get(file.name, [])
-            client.add_file(
-                notebook_id,
-                file,
-                wait=wait or replace,
-                wait_timeout=wait_timeout,
-            )
+            if converter is not None:
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    path = Path(tmpdir) / file.name
+                    path.write_bytes(converter(file))
+                    client.add_file(notebook_id, path, wait=wait or replace, wait_timeout=wait_timeout)
+            else:
+                client.add_file(notebook_id, file, wait=wait or replace, wait_timeout=wait_timeout)
             if replace and old_source_ids:
                 print(f"Deleting {len(old_source_ids)} replaced source(s) for {file.name}")
                 client.delete_sources(old_source_ids)
