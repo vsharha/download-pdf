@@ -51,7 +51,7 @@ def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, d
             print(f"  {page}")
         return
 
-    download_pdfs_from_pages(pages, subdir=course_name, exclude_files=config.sources.exclude_files)
+    download_pdfs_from_pages(pages, subdir=course_name, exclude_files=config.exclude_files)
 
     if config.echo360:
         download_transcripts(config.echo360.section_id, course_name, Path("courses"))

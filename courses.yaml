@@ -1,6 +1,7 @@
 courses:
   inf2d:
     notebook_id: "7733edc5-7ed2-4e59-b0be-a53dce198a26"
+    exclude_files: ["*[1][6-9][a-c].pdf"]
     sources:
       url: "https://opencourse.inf.ed.ac.uk/inf2d/course-materials"
       traverse: ["week-*"]

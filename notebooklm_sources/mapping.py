@@ -16,7 +16,6 @@ class SourcesConfig(BaseModel):
     collect: list[str] = Field(default_factory=list)
     include_text: list[str] = Field(default_factory=list)
     exclude_text: list[str] = Field(default_factory=list)
-    exclude_files: list[str] = Field(default_factory=list)
     pages: list[HttpUrl] = Field(default_factory=list)
 
 
@@ -32,6 +31,7 @@ class CourseConfig(BaseModel):
     sources: SourcesConfig
     notebook_id: str | None = Field(default=None, pattern=NOTEBOOK_ID_PATTERN)
     echo360: Echo360Config | None = None
+    exclude_files: list[str] = Field(default_factory=list)
     upload_original: bool = False
 
 
