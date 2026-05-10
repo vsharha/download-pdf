@@ -1,33 +1,28 @@
+import fnmatch
 import itertools
 
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-import re
 
 
-def glob_to_regex(pattern: str) -> re.Pattern:
-    regex = re.escape(pattern)
-    regex = regex.replace(r"\*", "[^/]+")
-    return re.compile("^" + regex + "$")
-
-
-def same_domain(base: str, url: str) -> bool:
-    return urlparse(base).netloc == urlparse(url).netloc
+def path_matches(href: str, pattern: str) -> bool:
+    n = pattern.count("/") + 1
+    segments = urlparse(href).path.strip("/").split("/")
+    if len(segments) < n:
+        return False
+    return fnmatch.fnmatchcase("/".join(segments[-n:]), pattern)
 
 
 def collect_links(
     page_url: str,
-    path_pattern: str,
-    link_text_patterns: list[str] | None = None,
+    path_patterns: list[str],
+    include_text: list[str] | None = None,
+    exclude_text: list[str] | None = None,
     visited: set[str] | None = None,
 ) -> set[str]:
-    rx = glob_to_regex(path_pattern)
-    text_rxs = [glob_to_regex(p) for p in (link_text_patterns or [])]
-
     html = requests.get(page_url, timeout=15).text
     soup = BeautifulSoup(html, "html.parser")
-
     matches = set()
 
     for a in soup.select("a[href]"):
@@ -39,17 +34,17 @@ def collect_links(
         if visited and href in visited:
             continue
 
-        path = urlparse(href).path.lstrip("/")
+        text = a.get_text(strip=True)
+        path_match = any(path_matches(href, p) for p in path_patterns)
+        text_match = any(fnmatch.fnmatchcase(text, p) for p in (include_text or []))
 
-        path_match = (
-            rx.match("/" + path)
-            if path_pattern.startswith("/")
-            else rx.match(path.split("/")[-1])
-        )
-        text_match = any(t.match(a.get_text(strip=True)) for t in text_rxs)
+        if not (path_match or text_match):
+            continue
 
-        if path_match or text_match:
-            matches.add(href)
+        if any(fnmatch.fnmatchcase(text, p) for p in (exclude_text or [])):
+            continue
+
+        matches.add(href)
 
     return matches
 

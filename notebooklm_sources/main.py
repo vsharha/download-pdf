@@ -9,25 +9,32 @@ from notebooklm_sources.echo360 import download_transcripts
 
 
 def resolve_pages(sources: SourcesConfig) -> set[str]:
-    visited = {str(sources.url)}
+    base = str(sources.url) if sources.url else None
+    visited = {base} if base else set()
+    current = {base} if base else set()
+
+    for step in sources.traverse:
+        next_level = set()
+        for page in current:
+            if "{n}" in step:
+                next_level |= collect_indexed_pages(page, step)
+            else:
+                next_level |= collect_links(page, [step], visited=visited)
+        next_level -= visited
+        visited |= next_level
+        current = next_level
+
     pages = set()
-    for pattern_path in sources.patterns:
-        steps = pattern_path.split("/")
-        current = {str(sources.url)}
-        for i, step in enumerate(steps):
-            is_last = i == len(steps) - 1
-            text_patterns = sources.link_text_patterns if is_last else None
-            next_level = set()
-            for page in current:
-                if "{n}" in step:
-                    next_level |= collect_indexed_pages(page, step)
-                else:
-                    next_level |= collect_links(page, step, text_patterns, visited)
-            next_level -= visited
-            visited |= next_level
-            current = next_level
-        pages |= current
-    pages |= {str(page) for page in sources.extra_pages}
+    for page in current:
+        pages |= collect_links(
+            page,
+            sources.collect,
+            include_text=sources.include_text,
+            exclude_text=sources.exclude_text,
+            visited=visited,
+        )
+
+    pages |= {str(page) for page in sources.pages}
     return pages
 
 

@@ -11,10 +11,12 @@ DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[1] / "courses.yaml"
 class SourcesConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    url: HttpUrl
-    patterns: list[str] = Field(default_factory=list)
-    link_text_patterns: list[str] = Field(default_factory=list)
-    extra_pages: list[HttpUrl] = Field(default_factory=list)
+    url: HttpUrl | None = None
+    traverse: list[str] = Field(default_factory=list)
+    collect: list[str] = Field(default_factory=list)
+    include_text: list[str] = Field(default_factory=list)
+    exclude_text: list[str] = Field(default_factory=list)
+    pages: list[HttpUrl] = Field(default_factory=list)
 
 
 class Echo360Config(BaseModel):
