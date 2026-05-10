@@ -38,7 +38,7 @@ def resolve_pages(sources: SourcesConfig) -> set[str]:
     return pages
 
 
-def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, dry_run: bool):
+def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, dry_run: bool, replace: bool):
     print(f"\n{'=' * 40}")
     print(f"Processing: {course_name}")
     print(f"{'=' * 40}")
@@ -77,21 +77,27 @@ def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, d
     if pdfs:
         converter = None if config.upload_original else convert_to_image_bytes
         print(f"Found {len(pdfs)} PDF(s) to upload")
-        upload_sources(notebook_id, pdfs, converter=converter)
+        upload_sources(notebook_id, pdfs, converter=converter, replace=replace)
 
     if transcripts:
         print(f"Found {len(transcripts)} transcript(s) to upload")
-        upload_sources(notebook_id, transcripts)
+        upload_sources(notebook_id, transcripts, replace=replace)
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-upload", action="store_true", help="Download sources but skip NotebookLM upload")
     parser.add_argument("--dry-run", action="store_true", help="Resolve sources and print them without downloading")
+    parser.add_argument("--replace", action="store_true", help="Re-upload files that already exist in NotebookLM, replacing the old versions")
     args = parser.parse_args()
 
+    if args.replace and args.no_upload:
+        parser.error("--replace has no effect with --no-upload")
+    if args.replace and args.dry_run:
+        parser.error("--replace has no effect with --dry-run")
+
     for course_name, config in load_mapping().items():
-        process_course(course_name, config, no_upload=args.no_upload, dry_run=args.dry_run)
+        process_course(course_name, config, no_upload=args.no_upload, dry_run=args.dry_run, replace=args.replace)
 
 
 if __name__ == "__main__":
