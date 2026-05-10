@@ -1,7 +1,10 @@
+import time
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
 from urllib.parse import urlparse
+
+import httpx
 
 from notebooklm_tools.core.auth import get_auth_manager
 from notebooklm_tools.core.client import NotebookLMClient
@@ -97,7 +100,15 @@ def upload_sources(
                 client.add_file(notebook_id, file, wait=wait or replace, wait_timeout=wait_timeout)
             if replace and old_source_ids:
                 print(f"Deleting {len(old_source_ids)} replaced source(s) for {file.name}")
-                client.delete_sources(old_source_ids)
+                for attempt in range(1, 4):
+                    try:
+                        client.delete_sources(old_source_ids)
+                        break
+                    except httpx.ReadTimeout:
+                        if attempt == 3:
+                            raise
+                        print(f"Delete timed out, retrying ({attempt}/3)...")
+                        time.sleep(2 ** attempt)
 
     if files_to_upload:
         print(f"Uploaded {len(files_to_upload)} file(s)")
