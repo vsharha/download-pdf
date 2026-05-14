@@ -19,8 +19,9 @@ _DPI = {
 
 
 def download_pdfs_from_pages(pages: set[str], subdir: str = "", exclude_files: list[str] | None = None):
-    out = Path(COURSES_DIR) / subdir / "pdf"
+    out = Path(COURSES_DIR) / subdir / "scraped"
     out.mkdir(parents=True, exist_ok=True)
+    (Path(COURSES_DIR) / subdir / "manual").mkdir(parents=True, exist_ok=True)
 
     existing = {p.name for p in out.iterdir() if p.suffix.lower() == ".pdf"}
 

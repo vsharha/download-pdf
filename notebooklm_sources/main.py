@@ -64,20 +64,33 @@ def process_course(course_name: str, config: CourseConfig, *, no_upload: bool, d
         print("No notebook ID configured; nothing was uploaded.")
         return
 
-    pdf_dir = Path("courses") / course_name / "pdf"
+    scraped_dir = Path("courses") / course_name / "scraped"
+    manual_dir = Path("courses") / course_name / "manual"
     transcript_dir = Path("courses") / course_name / "transcripts"
 
-    pdfs = sorted(pdf_dir.glob("*.pdf")) if pdf_dir.exists() else []
+    scraped_pdfs = sorted(scraped_dir.glob("*.pdf")) if scraped_dir.exists() else []
+    manual_files = sorted(manual_dir.iterdir()) if manual_dir.exists() else []
     transcripts = sorted(transcript_dir.glob("*.txt")) if transcript_dir.exists() else []
 
-    if not pdfs and not transcripts:
+    if not scraped_pdfs and not manual_files and not transcripts:
         print("No files to upload.")
         return
 
-    if pdfs:
-        converter = None if config.upload_original else lambda p: convert_to_image_bytes(p, config.pdf_quality)
-        print(f"Found {len(pdfs)} PDF(s) to upload")
-        upload_sources(notebook_id, pdfs, converter=converter, replace=replace)
+    converter = None if config.upload_original else lambda p: convert_to_image_bytes(p, config.pdf_quality)
+
+    if scraped_pdfs:
+        print(f"Found {len(scraped_pdfs)} scraped PDF(s) to upload")
+        upload_sources(notebook_id, scraped_pdfs, converter=converter, replace=replace)
+
+    if manual_files:
+        manual_pdfs = [f for f in manual_files if f.suffix.lower() == ".pdf"]
+        manual_others = [f for f in manual_files if f.suffix.lower() != ".pdf"]
+        if manual_pdfs:
+            print(f"Found {len(manual_pdfs)} manual PDF(s) to upload")
+            upload_sources(notebook_id, manual_pdfs, converter=converter, replace=replace)
+        if manual_others:
+            print(f"Found {len(manual_others)} manual file(s) to upload")
+            upload_sources(notebook_id, manual_others, replace=replace)
 
     if transcripts:
         print(f"Found {len(transcripts)} transcript(s) to upload")
